@@ -104,12 +104,12 @@ void bst_delete_node(bst_t* t, void* key) {
  */
 static void bst_print_aux(bst_t* t, bst_node_t* p) {
 	if(p != NULL ) {
+		bst_print_aux(t, p->left);
 		fprintf(stdout, "Printing node: (");
 		t->print_key(p->key);
 		fprintf(stdout, ", ");
 		t->print_info(p->info);
 		fprintf(stdout, ")\n\n");
-		bst_print_aux(t, p->left);
 		bst_print_aux(t, p->right);
 	}
 }
