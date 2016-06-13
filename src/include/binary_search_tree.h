@@ -1,5 +1,5 @@
-#ifndef RED_BLACK_TREE_H
-#define RED_BLACK_TREE_H
+#ifndef BINARY_SEARCH_TREE_H
+#define BINARY_SEARCH_TREE_H
 
 typedef struct bst_node_t {
 	void* key;	// index for searching
@@ -29,11 +29,13 @@ typedef struct bst_t {
 /*
  *	bst_t _constructor
  */
-bst_t* bst_constructor(int (*f_compare)(const void* lhs, const void* rhs),
-																void (*key_destructor)(void* key),
-																void (*info_destructor)(void* info),
-																void (*print_key)(const void* key),
-																void (*print_info)(const void* info));
+bst_t* bst_constructor(
+	int (*f_compare)(const void* lhs, const void* rhs),
+	void (*key_destructor)(void* key),
+	void (*info_destructor)(void* info),
+	void (*print_key)(const void* key),
+	void (*print_info)(const void* info)
+);
 
 /*
  *	bst_t destructor

@@ -44,7 +44,7 @@ G_TEST_COMPILER := g++
 GTEST_DIR = googletest/googletest
 USER_DIR = tests
 GTEST_CPPFLAGS += -isystem $(GTEST_DIR)/include
-GTEST_CXXFLAGS += -g -std=c++11 -Wall -Wextra -pthread
+GTEST_CXXFLAGS += -g -Wall -Wextra -pthread
 
 GTEST_HEADERS = $(GTEST_DIR)/include/gtest/*.h \
 								$(GTEST_DIR)/include/gtest/internal/*.h

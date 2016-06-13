@@ -6,11 +6,12 @@
 /*
  *	Public interface
  */
-bst_t* bst_constructor(int (*f_compare)(const void* lhs, const void* rhs),
-																void (*key_destructor)(void* key),
-																void (*info_destructor)(void* info),
-																void (*print_key)(const void* key),
-																void (*print_info)(const void* info)) 
+bst_t* bst_constructor(
+	int (*f_compare)(const void* lhs, const void* rhs),
+	void (*key_destructor)(void* key),
+	void (*info_destructor)(void* info),
+	void (*print_key)(const void* key),
+	void (*print_info)(const void* info)) 
 {
 	bst_t* t = (bst_t*)malloc(sizeof(bst_t));
 	t->f_compare = f_compare;
