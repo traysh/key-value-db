@@ -12,6 +12,7 @@ typedef bst_t hash_table_impl;
 
 struct hash_table_t {
 	hash_table_impl* impl;
+	unsigned int (*hash_function)(const void* key);
 };
 
 /*
@@ -22,7 +23,7 @@ hash_table_t* hash_table_constructor();
 /*
  *	hash_table_t destructor
  */
-void hash_table_destructor();
+void hash_table_destructor(hash_table_t* t);
 
 /*
  *	Insert key value pair on hash_map
