@@ -93,11 +93,11 @@ bst_node_t* bst_insert_node(bst_t* t, void* key, void* info) {
 	return bst_insert_node_aux(t, &t->root, key, info);
 }
 
-static bst_node_t* min_value(bst_t* t) {
-	if(t == NULL || t->root == NULL)
+static bst_node_t* min_value_from_node(bst_node_t* p) {
+	if(p == NULL)
 		return NULL;
 
-	bst_node_t* ret = t->root;
+	bst_node_t* ret = p;
 	while(ret->left != NULL) {
 		ret = ret->left;
 	}
@@ -105,8 +105,52 @@ static bst_node_t* min_value(bst_t* t) {
 	return ret;
 }
 
+static void bst_delete_node_aux(bst_t* t, bst_node_t* p, void* key) {
+	if(p == NULL)
+		return;
+
+	int comp = t->f_compare(p->key, key);
+
+	if(comp > 0) {
+		bst_delete_node_aux(t, p->left, key);
+	} else if(comp < 0) {
+		bst_delete_node_aux(t, p->right, key);
+	} else  {
+		// No child
+		if(p->left == NULL && p->right == NULL) {
+			t->key_destructor(p->key);
+			t->info_destructor(p->info);
+			free(p);
+			p = NULL;
+		}	else if(p->left == NULL) { // 1 child
+			bst_node_t* tmp = p;
+			p = p->right;
+			t->key_destructor(tmp->key);
+			t->info_destructor(tmp->info);
+			free(tmp);
+			tmp = NULL;
+		} else if(p->right == NULL) {
+			bst_node_t* tmp = p;
+			p = p->left;
+			t->key_destructor(tmp->key);
+			t->info_destructor(tmp->info);
+			free(tmp);
+			tmp = NULL;
+		}	else { //2 child
+			bst_node_t* tmp = min_value_from_node(p->right);
+
+			t->key_destructor(p->key);
+			p->key = tmp->key;
+
+			t->info_destructor(p->info);
+			p->info = tmp->info;
+			//TODO TERMINAR
+		}
+	}
+}
+
 void bst_delete_node(bst_t* t, void* key) {
-	//TODO
+	bst_delete_node_aux(t, t->root, key);
 }
 
 /*
