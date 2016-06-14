@@ -93,11 +93,20 @@ bst_node_t* bst_insert_node(bst_t* t, void* key, void* info) {
 	return bst_insert_node_aux(t, &t->root, key, info);
 }
 
-void bst_delete_node(bst_t* t, void* key) {
-	// TODO
-	if(t->f_compare(t->root->key, key) == 1) {
-		free(t);
+static bst_node_t* min_value(bst_t* t) {
+	if(t == NULL || t->root == NULL)
+		return NULL;
+
+	bst_node_t* ret = t->root;
+	while(ret->left != NULL) {
+		ret = ret->left;
 	}
+	
+	return ret;
+}
+
+void bst_delete_node(bst_t* t, void* key) {
+	//TODO
 }
 
 /*

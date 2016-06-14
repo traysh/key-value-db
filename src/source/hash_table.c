@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "hash_table.h"
 
@@ -34,7 +35,7 @@ static void hash_table_print_info(const void* info) {
 
 static unsigned int hash_function(const void* key) {
 	//TODO
-	printf("%s\n", key);
+	printf("%s\n", (const char*)key);
 	return 1;
 }
 
@@ -55,13 +56,27 @@ void hash_table_destructor(hash_table_t* t) {
 	free(t);
 }
 
-int hash_table_insert_elem(hash_table_t* t, const char* key, const char* value) {
+typedef struct pair_t {
+	unsigned int* key;
+	char* info;
+} pair_t;
+
+static pair_t make_pair(unsigned int* key, const char* info) {
+	pair_t p;
+	p.key = (unsigned int*)malloc(sizeof(unsigned int));
+	*(p.key) = *key;
+	p.info = strdup(info);
+
+	return p;
+}
+
+int hash_table_insert_elem(hash_table_t* t, const char* key, const char* info) {
 	if(t == NULL) 
 		return 0;
 
 	unsigned int uikey = t->hash_function(key);
-	return bst_insert_node(t->impl, &uikey, (void*)value) == NULL ? 0 : 1;
-
+	pair_t p = make_pair(&uikey, info);
+	return bst_insert_node(t->impl, p.key, (void*)p.info) == NULL ? 0 : 1;
 }
 
 char* hash_table_find_elem(hash_table_t* t, const char* key) {
