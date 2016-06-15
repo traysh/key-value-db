@@ -22,10 +22,4 @@ To Run all tests using valgrind, use:
 <br>
   `$make test-valgrind`
   
-## TODO's
-1.  Finish BST development
-2.  Finish Hash-table development
-3.  Complete Unit tests
-4.  Test in another linux distribution
-  
 ### Obs: All development and testing was made on Arch-Linux x86_64.
