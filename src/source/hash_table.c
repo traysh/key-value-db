@@ -94,12 +94,25 @@ char* hash_table_find_elem(hash_table_t* t, const char* key) {
 	if(t == NULL || t->impl == NULL)
 		return NULL;
 
-	bst_node_t* elem = bst_find_node(t->impl, (void*)key);
+	unsigned int uikey = t->hash_function(key, strlen(key));
+	unsigned int* uikey_m = (unsigned int*)malloc(sizeof(unsigned int));
+	*uikey_m = uikey;
+	bst_node_t* elem = bst_find_node(t->impl, (void*)uikey_m);
+	free(uikey_m);
 	return elem != NULL ? (char*)elem->info : NULL;
 }
 
 int hash_table_update_elem(hash_table_t* t, const char* key, const char* new_value) {
-	if(bst_update_node_info(t->impl, (void*)key, (void*)new_value))
+	char* new_value_cpy = strdup(new_value);
+	unsigned int uikey = t->hash_function(key, strlen(key));
+	unsigned int* uikey_m = (unsigned int*)malloc(sizeof(unsigned int));
+	*uikey_m = uikey;
+
+
+	bst_node_t* result = bst_update_node_info(t->impl, (void*)uikey_m, (void*)new_value_cpy);
+	free(uikey_m);
+
+	if(result)
 		return 1;
 	return 0;
 }
@@ -108,7 +121,12 @@ void hash_table_delete_elem(hash_table_t* t, const char* key) {
 	if(t == NULL || t->impl == NULL)
 		return;
 
-	bst_delete_node(t->impl, (void*)key);
+	unsigned int uikey = t->hash_function(key, strlen(key));
+	unsigned int* uikey_m = (unsigned int*)malloc(sizeof(unsigned int));
+	*uikey_m = uikey;
+
+	bst_delete_node(t->impl, (void*)uikey_m);
+	free(uikey_m);
 }
 
 long hash_table_size(hash_table_t* t) {
@@ -116,3 +134,8 @@ long hash_table_size(hash_table_t* t) {
 		return t->impl->size;
 	return -1;
 }
+
+void hash_table_print(hash_table_t* t) {
+	bst_print(t->impl);
+}
+

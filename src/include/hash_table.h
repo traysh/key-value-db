@@ -54,4 +54,6 @@ void hash_table_delete_elem(hash_table_t* t, const char* key);
  */
 long hash_table_size(hash_table_t* t);
 
+void hash_table_print(hash_table_t* t);
+
 #endif
