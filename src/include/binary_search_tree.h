@@ -59,6 +59,13 @@ bst_node_t* bst_insert_node(bst_t* t, void* key, void* info);
 void bst_delete_node(bst_t* t, void* key);
 
 /*
+ *	Updates a node with the given key.
+ *		If node is present on bst, this function will return the updated node.
+ *		NULL will be returned otherwise
+ */
+bst_node_t* bst_update_node_info(bst_t*, void* key, void* info);
+
+/*
  *	Prints the tree using print_key and print_info functions 
  */
 void bst_print(bst_t* t);

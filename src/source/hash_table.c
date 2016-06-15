@@ -99,8 +99,9 @@ char* hash_table_find_elem(hash_table_t* t, const char* key) {
 }
 
 int hash_table_update_elem(hash_table_t* t, const char* key, const char* new_value) {
-	//TODO
-	return -1;
+	if(bst_update_node_info(t->impl, (void*)key, (void*)new_value))
+		return 1;
+	return 0;
 }
 
 void hash_table_delete_elem(hash_table_t* t, const char* key) {

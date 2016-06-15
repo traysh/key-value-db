@@ -186,6 +186,17 @@ void bst_delete_node(bst_t* t, void* key) {
 	bst_delete_node_aux(t, &(t->root), key);
 }
 
+
+bst_node_t* bst_update_node_info(bst_t* t , void* key, void* info) {
+	bst_node_t* found = bst_find_node(t, key);
+	if(found == NULL)
+		return NULL;
+
+	t->info_destructor(found->info);
+	found->info = info;
+	return found;
+}
+
 /*
  *	Preorder print
  */

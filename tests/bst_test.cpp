@@ -306,3 +306,48 @@ TEST(BST_TEST, DELETE_NODE) {
 
 	bst_destructor(t);
 }
+
+TEST(BST_TEST, UPDATE_NODE) {
+	bst_t* t = bst_constructor(bst_compare, bst_key_destructor, bst_info_destructor, bst_print_key, bst_print_info);
+	EXPECT_EQ(t->size, 0);
+	
+	// PAIR 0
+	long key = 6;
+	char info[] = "def";
+	char* infocopy = (char*)malloc(sizeof(char) * (strlen(info) + 1));
+	strcpy(infocopy, info);
+	bst_insert_node(t, &key, infocopy);
+	EXPECT_EQ(t->size, 1);
+
+	// PAIR 1
+	long key1 = 4;
+	char info1[] = "abcd";
+	char* info1copy = (char*)malloc(sizeof(char) * (strlen(info1) + 1));
+	strcpy(info1copy, info1);
+	bst_insert_node(t, &key1, info1copy);
+	EXPECT_EQ(t->size, 2);
+
+	// PAIR 2
+	long key2 = 20;
+	char info2[] = "foobar";
+	char* info2copy = (char*)malloc(sizeof(char) * (strlen(info2) + 1));
+	strcpy(info2copy, info2);
+	bst_insert_node(t, &key2, info2copy);
+	EXPECT_EQ(t->size, 3);
+
+	// PAIR 3
+	long key3 = 10;
+	char info3[] = "3";
+	char* info3copy = (char*)malloc(sizeof(char) * (strlen(info3) + 1));
+	strcpy(info3copy, info3);
+	bst_insert_node(t, &key3, info3copy);
+	EXPECT_EQ(t->size, 4);
+
+	char new_info[] = "new info here";
+	char* new_info_copy = (char*)malloc(sizeof(char) * (strlen(new_info) + 1));
+	strcpy(new_info_copy, new_info);
+	bst_node_t* updated1 = bst_update_node_info(t, &key3, new_info_copy);
+	EXPECT_EQ(0, strcmp((char*)updated1->info, new_info));
+	
+	bst_destructor(t);
+}
