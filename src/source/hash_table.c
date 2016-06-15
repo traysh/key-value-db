@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include<limits.h>
 
 #include "hash_table.h"
 
@@ -33,12 +34,22 @@ static void hash_table_print_info(const void* info) {
 	fprintf(stdout, "%s", (char*)info);
 }
 
-static unsigned int hash_function(const void* key) {
-	//TODO
-	printf("%s\n", (const char*)key);
-	return 1;
-}
+/*
+ *	FIXME - find a better hash function...
+ */
+static uint32_t hash_function(const char* key, int len) {
+	unsigned int hashval = 0;
+	int i = 0;
 
+	/* Convert our string to an integer */
+	while( hashval < UINT_MAX && i < len ) {
+		hashval = hashval << 8;
+		hashval += key[ i ];
+		i++;
+	}
+
+	return hashval;
+}
 
 hash_table_t* hash_table_constructor() {
 	hash_table_t* instance = (hash_table_t*)malloc(sizeof(hash_table_t));
@@ -71,10 +82,10 @@ static pair_t make_pair(unsigned int* key, const char* info) {
 }
 
 int hash_table_insert_elem(hash_table_t* t, const char* key, const char* info) {
-	if(t == NULL) 
+	if(t == NULL)
 		return 0;
 
-	unsigned int uikey = t->hash_function(key);
+	unsigned int uikey = t->hash_function(key, strlen(key));
 	pair_t p = make_pair(&uikey, info);
 	return bst_insert_node(t->impl, p.key, (void*)p.info) == NULL ? 0 : 1;
 }
@@ -104,4 +115,3 @@ long hash_table_size(hash_table_t* t) {
 		return t->impl->size;
 	return -1;
 }
-

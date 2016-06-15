@@ -9,11 +9,12 @@
  *	FIXME - make *impl more flexible. Maybe use DI to inject the implementation
  */
 typedef bst_t hash_table_impl;
+typedef unsigned int uint32_t;
 
-struct hash_table_t {
+typedef struct hash_table_t {
 	hash_table_impl* impl;
-	unsigned int (*hash_function)(const void* key);
-};
+  uint32_t (*hash_function)(const char* key, int len);
+} hash_table_t;
 
 /*
  *	hash_table_t constructor
