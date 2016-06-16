@@ -5,29 +5,33 @@
 
 #include "hash_table.h"
 
-static int hash_table_compare(const void* lhs, const void* rhs) {
-	unsigned int ulhs = *(unsigned int*)lhs;
-	unsigned int urhs = *(unsigned int*)rhs;
+static void hash_table_print_key(const void* key) {
+	fprintf(stdout, "%s", ((hash_table_key_t*)key)->raw_key);
+}
 
-	if(ulhs > urhs) {
+static int hash_table_compare(const void* lhs, const void* rhs) {
+	hash_table_key_t ulhs = *(hash_table_key_t*)lhs;
+	hash_table_key_t urhs = *(hash_table_key_t*)rhs;
+
+	if(*ulhs.hashed_key > *urhs.hashed_key) {
 		return 1;
-	} else if(ulhs == urhs) {
-		return 0;
-	} else {
+	} else if(*ulhs.hashed_key < *urhs.hashed_key) {
 		return -1;
+	} else {
+		return strcmp(ulhs.raw_key, urhs.raw_key);
 	}
 }
 
 static void hash_table_key_destructor(void* key) {
-	free(key);
+	hash_table_key_t* orig_key = (hash_table_key_t*)key;
+	free(orig_key->hashed_key);
+	free(orig_key->raw_key);
+	free(orig_key);
 }
 
 static void hash_table_info_destructor(void* info) {
-	free(info);
-}
-
-static void hash_table_print_key(const void* key) {
-	fprintf(stdout, "%d", *((const unsigned int*)key));
+	char* orig_info = (char*)info;
+	free(orig_info);
 }
 
 static void hash_table_print_info(const void* info) {
@@ -38,7 +42,7 @@ static void hash_table_print_info(const void* info) {
  *	FIXME - find a better hash function...
  */
 static uint32_t hash_function(const char* key, int len) {
-	unsigned int hashval = 0;
+	uint32_t hashval = 0;
 	int i = 0;
 
 	/* Convert our string to an integer */
@@ -68,19 +72,28 @@ void hash_table_destructor(hash_table_t* t) {
 }
 
 typedef struct pair_t {
-	unsigned int* key;
+	hash_table_key_t* key;
 	char* info;
 } pair_t;
 
-static unsigned int* make_uint(unsigned int val) {
-	unsigned int* ret = (unsigned int*) malloc(sizeof(unsigned int));
+static uint32_t* make_uint(uint32_t val) {
+	uint32_t* ret = (uint32_t*) malloc(sizeof(uint32_t));
 	*ret = val;
 	return ret;
 }
 
-static pair_t make_pair(unsigned int* key, const char* info) {
+static hash_table_key_t* make_hash_table_key(hash_table_t* t, const char* key) {
+	hash_table_key_t* composed_key = (hash_table_key_t*)malloc(sizeof(hash_table_key_t));
+
+	composed_key->raw_key = strdup(key);
+	composed_key->hashed_key = make_uint(t->hash_function(key, strlen(key)));
+	return composed_key;
+}
+
+
+static pair_t make_pair(hash_table_t* t, const char* key, const char* info) {
 	pair_t p;
-	p.key = make_uint(*key);
+	p.key = make_hash_table_key(t, key);
 	p.info = strdup(info);
 
 	return p;
@@ -90,8 +103,7 @@ int hash_table_insert_elem(hash_table_t* t, const char* key, const char* info) {
 	if(t == NULL)
 		return 0;
 
-	unsigned int uikey = t->hash_function(key, strlen(key));
-	pair_t p = make_pair(&uikey, info);
+	pair_t p = make_pair(t, key, info);
 	return bst_insert_node(t->impl, p.key, (void*)p.info) == NULL ? 0 : 1;
 }
 
@@ -99,19 +111,18 @@ char* hash_table_find_elem(hash_table_t* t, const char* key) {
 	if(t == NULL || t->impl == NULL)
 		return NULL;
 
-	unsigned int* uikey = make_uint(t->hash_function(key, strlen(key)));
-	bst_node_t* elem = bst_find_node(t->impl, (void*)uikey);
-	free(uikey);
+	hash_table_key_t* hkey = make_hash_table_key(t, key);
+	bst_node_t* elem = bst_find_node(t->impl, (void*)hkey);
+	hash_table_key_destructor(hkey);
+
 	return elem != NULL ? (char*)elem->info : NULL;
 }
 
 int hash_table_update_elem(hash_table_t* t, const char* key, const char* new_value) {
-	unsigned int uikey = t->hash_function(key, strlen(key));
-	pair_t p = make_pair(&uikey, new_value);
-	
-	bst_node_t* result = bst_update_node_info(t->impl, (void*)p.key, (void*)p.info);
-	free(p.key);
-	free(p.info);
+	char* infocpy = strdup(new_value);
+	hash_table_key_t* hkey = make_hash_table_key(t, key);
+	bst_node_t* result = bst_update_node_info(t->impl, (void*)hkey, (void*)infocpy);
+	hash_table_key_destructor(hkey);
 
 	if(result)
 		return 1;
@@ -122,9 +133,9 @@ void hash_table_delete_elem(hash_table_t* t, const char* key) {
 	if(t == NULL || t->impl == NULL)
 		return;
 
-	unsigned int* uikey = make_uint(t->hash_function(key, strlen(key)));
-	bst_delete_node(t->impl, (void*)uikey);
-	free(uikey);
+	hash_table_key_t* hkey = make_hash_table_key(t, key);
+	bst_delete_node(t->impl, (void*)hkey);
+	hash_table_key_destructor(hkey);
 }
 
 long hash_table_size(hash_table_t* t) {
