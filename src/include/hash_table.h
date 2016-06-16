@@ -15,7 +15,7 @@ typedef struct hash_table_t {
 } hash_table_t;
 
 /*
- *	To treat colisions, the hash table key must contain both the raw key and the hashed key
+ *	To treat collisions, the hash table key must contain both the raw key and the hashed key
  */
 typedef struct hash_table_key_t {
 	uint32_t* hashed_key;

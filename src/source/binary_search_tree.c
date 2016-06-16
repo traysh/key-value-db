@@ -138,7 +138,7 @@ static void bst_delete_node_without_free_members(bst_t* t, bst_node_t** p, void*
 }
 
 static void bst_delete_node_aux(bst_t* t, bst_node_t** p, void* key) {
-	if(p == NULL)
+	if(*p == NULL)
 		return;
 
 	int comp = t->f_compare((*p)->key, key);

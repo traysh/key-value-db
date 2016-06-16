@@ -126,6 +126,8 @@ int hash_table_update_elem(hash_table_t* t, const char* key, const char* new_val
 
 	if(result)
 		return 1;
+
+	free(infocpy);
 	return 0;
 }
 
