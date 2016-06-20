@@ -1,7 +1,9 @@
 # key-value-db
-This project is a simple implementation of a hash-map.
+This project contains different implementations of hash maps
 <br>
-The underlaying data structure of this implementation is a Binary Search Tree.
+Currently developed:
+  1.  Using a Binary Search Tree as underlying data structure
+  2.  Using a Dynamic resizing array as underlying data structure
 
 ## Dependencies:
   This project depends on:

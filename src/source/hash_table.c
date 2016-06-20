@@ -85,7 +85,7 @@ int hash_table_insert_elem(hash_table_t** t, const char* key, const char* value)
 		return 0;
 
 	if(((*t)->size + 1) % (*t)->capacity == 0) {
-		hash_table_rehash(&(*t));
+		hash_table_rehash(t);
 	}
 
 	uint32_t hashed_key = (*t)->hash_function((*t), key, strlen(key));
