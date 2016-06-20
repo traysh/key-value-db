@@ -180,7 +180,7 @@ TEST(BST_TEST, FIND_NODE) {
 TEST(BST_TEST, DELETE_NODE) {
 	bst_t* t = bst_constructor(bst_compare, bst_key_destructor, bst_info_destructor, bst_print_key, bst_print_info);
 	EXPECT_EQ(t->size, 0);
-	
+
 	// PAIR 0
 	long key = 6;
 	char info[] = "def";
@@ -244,7 +244,7 @@ TEST(BST_TEST, DELETE_NODE) {
 	strcpy(info7copy, info7);
 	bst_insert_node(t, &key7, info7copy);
 	EXPECT_EQ(t->size, 8);
-	
+
 	// PAIR 8
 	long key8 = 22;
 	char info8[] = "5";
@@ -297,7 +297,7 @@ TEST(BST_TEST, DELETE_NODE) {
 	bst_node_t* found1 = bst_find_node(t, &key11);
 	EXPECT_EQ(found1, nullptr);
 	EXPECT_EQ(t->size, 11);
-	
+
 	// Delete node without child
 	bst_delete_node(t, &key12);
 	bst_node_t* found2 = bst_find_node(t, &key12);
@@ -310,7 +310,7 @@ TEST(BST_TEST, DELETE_NODE) {
 TEST(BST_TEST, UPDATE_NODE) {
 	bst_t* t = bst_constructor(bst_compare, bst_key_destructor, bst_info_destructor, bst_print_key, bst_print_info);
 	EXPECT_EQ(t->size, 0);
-	
+
 	// PAIR 0
 	long key = 6;
 	char info[] = "def";
@@ -348,6 +348,6 @@ TEST(BST_TEST, UPDATE_NODE) {
 	strcpy(new_info_copy, new_info);
 	bst_node_t* updated1 = bst_update_node_info(t, &key3, new_info_copy);
 	EXPECT_EQ(0, strcmp((char*)updated1->info, new_info));
-	
+
 	bst_destructor(t);
 }

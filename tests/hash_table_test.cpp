@@ -5,52 +5,13 @@
 #include <stdlib.h>
 #include <limits.h>
 
-TEST(HASH_TABLE_TEST, HASH_FUNCTION) {
-	hash_table_t* t = hash_table_constructor();
-	const char* key1 = "r.cmgleite@gmail.com";
-	const char* key2 = "r.cmgleite@gmail.coma";
-	const char* key3 = "r.cmgleite@gmail.comb";
-	const char* key4 = "aaa";
-	const char* key5 = "foobarfoobar";
-	const char* key6 = "1234556788";
-	const char* key7 = "foo@bar.com.br";
-	const char* key8 = "r.cmgleite@gmail.comd";
-
-
-	uint32_t hash1 = t->hash_function(key1, strlen(key1));
-	EXPECT_GT(hash1, 0);
-
-	uint32_t hash2 = t->hash_function(key2, strlen(key2));
-	EXPECT_GT(hash2, 0);
-
-	uint32_t hash3 = t->hash_function(key3, strlen(key3));
-	EXPECT_GT(hash3, 0);
-
-	uint32_t hash4 = t->hash_function(key4, strlen(key4));
-	EXPECT_GT(hash4, 0);
-
-	uint32_t hash5 = t->hash_function(key5, strlen(key5));
-	EXPECT_GT(hash5, 0);
-
-	uint32_t hash6 = t->hash_function(key6, strlen(key6));
-	EXPECT_GT(hash6, 0);
-
-	uint32_t hash7 = t->hash_function(key7, strlen(key7));
-	EXPECT_GT(hash7, 0);
-
-	uint32_t hash8 = t->hash_function(key8, strlen(key8));
-	EXPECT_GT(hash8, 0);
-
-	hash_table_destructor(t);
-}
-
 TEST(HASH_TABLE_TEST, INSERT_FIND) {
 	hash_table_t* t = hash_table_constructor();
-	EXPECT_EQ(hash_table_insert_elem(t, "r.cmgleite@gmail.com", "1"), 1);
-	EXPECT_EQ(hash_table_insert_elem(t, "r.cmgleite@gmail.coma", "2"), 1);
-	EXPECT_EQ(hash_table_insert_elem(t, "r.cmgleite@gmail.comb", "3"), 1);
-	EXPECT_EQ(hash_table_insert_elem(t, "r.cmgleite@gmail.comc", "4"), 1);
-	EXPECT_EQ(hash_table_insert_elem(t, "r.cmgleite@gmail.comd", "foobar"), 1);
+	EXPECT_EQ(hash_table_insert_elem(&t, "r.cmgleite@gmail.com", "1"), 1);
+	EXPECT_EQ(hash_table_insert_elem(&t, "r.cmgleite@gmail.coma", "2"), 1);
+	EXPECT_EQ(hash_table_insert_elem(&t, "r.cmgleite@gmail.comb", "3"), 1);
+	EXPECT_EQ(hash_table_insert_elem(&t, "r.cmgleite@gmail.comc", "4"), 1);
+	EXPECT_EQ(hash_table_insert_elem(&t, "r.cmgleite@gmail.comd", "foobar"), 1);
 	EXPECT_EQ(hash_table_size(t), 5);
 
 	EXPECT_EQ(strcmp(hash_table_find_elem(t, "r.cmgleite@gmail.com"), "1"), 0);
@@ -66,7 +27,7 @@ TEST(HASH_TABLE_TEST, FIND_ELEMENT_NOT_INSERTED) {
 	hash_table_t* t = hash_table_constructor();
 	EXPECT_EQ(hash_table_find_elem(t, "foo"), nullptr);
 
-	EXPECT_EQ(hash_table_insert_elem(t, "r.cmgleite@gmail.com", "foobarfoobar"), 1);
+	EXPECT_EQ(hash_table_insert_elem(&t, "r.cmgleite@gmail.com", "foobarfoobar"), 1);
 	EXPECT_EQ(strcmp(hash_table_find_elem(t, "r.cmgleite@gmail.com"), "foobarfoobar"), 0);
 
 	hash_table_destructor(t);
@@ -75,7 +36,7 @@ TEST(HASH_TABLE_TEST, FIND_ELEMENT_NOT_INSERTED) {
 TEST(HASH_TABLE_TEST, UPDATE) {
 	hash_table_t* t = hash_table_constructor();
 
-	EXPECT_EQ(hash_table_insert_elem(t, "r.cmgleite@gmail.com", "foobarfoobar"), 1);
+	EXPECT_EQ(hash_table_insert_elem(&t, "r.cmgleite@gmail.com", "foobarfoobar"), 1);
 	EXPECT_EQ(strcmp(hash_table_find_elem(t, "r.cmgleite@gmail.com"), "foobarfoobar"), 0);
 
 	EXPECT_EQ(hash_table_update_elem(t, "r.cmgleite@gmail.com", "New value!"), 1);
@@ -94,11 +55,11 @@ TEST(HASH_TABLE_TEST, UPDATE_ELEMENT_NOT_INSERTED) {
 
 TEST(HASH_TABLE_TEST, DELETE) {
 	hash_table_t* t = hash_table_constructor();
-	EXPECT_EQ(hash_table_insert_elem(t, "r.cmgleite@gmail.com", "1"), 1);
-	EXPECT_EQ(hash_table_insert_elem(t, "r.cmgleite@gmail.coma", "2"), 1);
-	EXPECT_EQ(hash_table_insert_elem(t, "r.cmgleite@gmail.comb", "3"), 1);
-	EXPECT_EQ(hash_table_insert_elem(t, "r.cmgleite@gmail.comc", "4"), 1);
-	EXPECT_EQ(hash_table_insert_elem(t, "r.cmgleite@gmail.comd", "foobar"), 1);
+	EXPECT_EQ(hash_table_insert_elem(&t, "r.cmgleite@gmail.com", "1"), 1);
+	EXPECT_EQ(hash_table_insert_elem(&t, "r.cmgleite@gmail.coma", "2"), 1);
+	EXPECT_EQ(hash_table_insert_elem(&t, "r.cmgleite@gmail.comb", "3"), 1);
+	EXPECT_EQ(hash_table_insert_elem(&t, "r.cmgleite@gmail.comc", "4"), 1);
+	EXPECT_EQ(hash_table_insert_elem(&t, "r.cmgleite@gmail.comd", "foobar"), 1);
 	EXPECT_EQ(hash_table_size(t), 5);
 
 	EXPECT_EQ(strcmp(hash_table_find_elem(t, "r.cmgleite@gmail.com"), "1"), 0);
@@ -118,15 +79,15 @@ TEST(HASH_TABLE_TEST, DELETE) {
 	hash_table_destructor(t);
 }
 
-/*
- *	This is a test that only makes sense when using valgrind.
- */
+///*
+// *	This is a test that only makes sense when using valgrind.
+// */
 TEST(HASH_TABLE_TEST, DELETE_ELEMENT_NOT_INSERTED) {
 	hash_table_t* t = hash_table_constructor();
 
 	hash_table_delete_elem(t, "r.cmgleite@gmail.com");
-	EXPECT_EQ(hash_table_insert_elem(t, "r.cmgleite@gmail.com", "1"), 1);
-	EXPECT_EQ(hash_table_insert_elem(t, "r.cmgleite@gmail.coma", "2"), 1);
+	EXPECT_EQ(hash_table_insert_elem(&t, "r.cmgleite@gmail.com", "1"), 1);
+	EXPECT_EQ(hash_table_insert_elem(&t, "r.cmgleite@gmail.coma", "2"), 1);
 
 	EXPECT_EQ(strcmp(hash_table_find_elem(t, "r.cmgleite@gmail.com"), "1"), 0);
 	EXPECT_EQ(strcmp(hash_table_find_elem(t, "r.cmgleite@gmail.coma"), "2"), 0);
@@ -146,7 +107,7 @@ TEST(HASH_TABLE_TEST, INSERT_ELEM_BIG_KEY) {
 
 	char big_key[] = "qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnm";
 
-	EXPECT_EQ(hash_table_insert_elem(t, big_key, "1"), 1);
+	EXPECT_EQ(hash_table_insert_elem(&t, big_key, "1"), 1);
 	EXPECT_EQ(strcmp(hash_table_find_elem(t, big_key), "1"), 0);
 
 	hash_table_destructor(t);
@@ -159,7 +120,7 @@ TEST(HASH_TABLE_TEST, INSERT_TOO_MANY) {
 	for(int i = 0; i < loop_size; i++) {
 		char str[10];
 		sprintf(str, "%d", i);
-		hash_table_insert_elem(t, str, str);
+		hash_table_insert_elem(&t, str, str);
 	}
 
 	EXPECT_EQ(hash_table_size(t), loop_size);

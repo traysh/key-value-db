@@ -5,12 +5,12 @@ int main() {
 	hash_table_t* t = hash_table_constructor();
 	// Insert
 	printf("Insert Begin\n");
-	hash_table_insert_elem(t, "r.cmgleite@gmail.com", "1");
-	hash_table_insert_elem(t, "r.cmgleite@gmail.coma", "2");
-	hash_table_insert_elem(t, "r.cmgleite@gmail.comb", "3");
-	hash_table_insert_elem(t, "r.cmgleite@gmail.comc", "4");
-	hash_table_insert_elem(t, "r.cmgleite@gmail.comd", "5");
-	hash_table_insert_elem(t, "r.cmgleite@gmail.come", "6");
+	hash_table_insert_elem(&t, "r.cmgleite@gmail.com", "1");
+	hash_table_insert_elem(&t, "r.cmgleite@gmail.coma", "2");
+	hash_table_insert_elem(&t, "r.cmgleite@gmail.comb", "3");
+	hash_table_insert_elem(&t, "r.cmgleite@gmail.comc", "4");
+	hash_table_insert_elem(&t, "r.cmgleite@gmail.comd", "5");
+	hash_table_insert_elem(&t, "r.cmgleite@gmail.come", "6");
 	printf("Insert End\n");
 
 	hash_table_print(t);

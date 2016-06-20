@@ -12,7 +12,7 @@ typedef struct hash_table_entry_t {
 typedef struct hash_table_t {
 	uint32_t size;	// Number of entries inserted
 	uint32_t capacity; // size of the underlaying array
-  uint32_t (*hash_function)(const char* key, int len);
+  uint32_t (*hash_function)(hash_table_t* t, const char* key, int len);
 
 	hash_table_entry_t** table;
 } hash_table_t;
@@ -21,6 +21,7 @@ typedef struct hash_table_t {
  *	hash_table_t constructor
  */
 hash_table_t* hash_table_constructor();
+hash_table_t* hash_table_constructor(uint32_t capacity);
 
 /*
  *	hash_table_t destructor
@@ -31,7 +32,7 @@ void hash_table_destructor(hash_table_t* t);
  *	Insert key value pair on hash_map
  *		Return 0 if key was not inserted and 1 otherwise
  */
-int hash_table_insert_elem(hash_table_t* t, const char* key, const char* value);
+int hash_table_insert_elem(hash_table_t** t, const char* key, const char* value);
 
 /*
  *	Find info associated with the given key
