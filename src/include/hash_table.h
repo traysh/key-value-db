@@ -1,26 +1,21 @@
 #ifndef HASH_TABLE_H
 #define HASH_TABLE_H
 
-#include "binary_search_tree.h"
-
-/*
- * Simple implementation of a hash_table that stores only C string values
- */
-typedef bst_t hash_table_impl;
 typedef unsigned int uint32_t;
 
-typedef struct hash_table_t {
-	hash_table_impl* impl;
-  uint32_t (*hash_function)(const char* key, int len);
-} hash_table_t;
+typedef struct hash_table_entry_t {
+	char* key;
+	char* value;
+	hash_table_entry_t* next;
+} hash_table_entry_t;
 
-/*
- *	To treat collisions, the hash table key must contain both the raw key and the hashed key
- */
-typedef struct hash_table_key_t {
-	uint32_t* hashed_key;
-	char* raw_key;
-} hash_table_key_t;
+typedef struct hash_table_t {
+	uint32_t size;	// Number of entries inserted
+	uint32_t capacity; // size of the underlaying array
+  uint32_t (*hash_function)(const char* key, int len);
+
+	hash_table_entry_t** table;
+} hash_table_t;
 
 /*
  *	hash_table_t constructor
@@ -64,5 +59,6 @@ long hash_table_size(hash_table_t* t);
  *	Helper function that prints all elements inside the hash_table
  */
 void hash_table_print(hash_table_t* t);
+
 
 #endif
