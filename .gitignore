@@ -5,4 +5,4 @@
 .ycm_extra_conf.pyc
 key-value-db
 vgcore*
-
+*.kdev4

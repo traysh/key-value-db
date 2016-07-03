@@ -6,14 +6,14 @@ INCLUDE_PATH="./src/include"
 CXX := g++
 
 # Compiler flags
-CXX_FLAGS = -g -Wall -Werror -c -fmessage-length=0 -fstack-protector -Og
+CXX_FLAGS = -g -Wall -Werror -c -fmessage-length=0 -fstack-protector -Og -Wfatal-errors
 LD_FLAGS = -pthread
 
 # Files to be compiled
-C_FILES := $(shell find src -name '*.c')
-O_FILES := $(C_FILES:.c=.o)
+C_FILES := $(shell find src/ -type f -name '*.c')
+O_FILES := $(patsubst %.c,%.o,$(C_FILES))
 # Headers 
-C_DEPS := $(C_FILES:.c=.d)
+C_DEPS := $(patsubst %.c,%.d,$(C_FILES))
 
 ifneq ($(strip $(C_DEPS)),)
 -include $(C_DPES)
@@ -22,8 +22,10 @@ endif
 # Dynamic c files compilation
 src/source/%.o: src/source/%.c
 	@echo 'Building file: $<'
-	@echo 'Invoking: Cross gcc Compiler'
-	$(CXX) -I$(INCLUDE_PATH) $(CXX_FLAGS) -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -o "$@" "$<"
+	@echo 'Invoking: gcc Compiler'
+	#@echo $(CXX) -I$(INCLUDE_PATH) $(CXX_FLAGS) -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -o "$@" "$<"
+	#@echo $(CXX) -I$(INCLUDE_PATH) $(CXX_FLAGS) -MMD -MP -MF"$(patsubst %.o,%.d,$(O_FILES))" -MT"$(@)" -o "$@" "$<"
+	$(CXX) -I$(INCLUDE_PATH) $(CXX_FLAGS) -MMD -MP -MT"$(@)" -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 
@@ -44,7 +46,7 @@ G_TEST_COMPILER := g++
 GTEST_DIR = googletest/googletest
 USER_DIR = tests
 GTEST_CPPFLAGS += -isystem $(GTEST_DIR)/include
-GTEST_CXXFLAGS += -g -Wall -Wextra -pthread
+GTEST_CXXFLAGS += -g -Wall -Wextra -pthread -Wfatal-errors
 
 GTEST_HEADERS = $(GTEST_DIR)/include/gtest/*.h \
 								$(GTEST_DIR)/include/gtest/internal/*.h
@@ -69,15 +71,16 @@ gtest_main.a : gtest-all.o gtest_main.o
 
 GTEST_CPP_FILES := $(shell find tests  -name '*.cpp')
 
-G_TEST_O_FILES := $(GTEST_CPP_FILES:.cpp=.o)
-GTEST_C_DEPS := $(GTEST_CPP_FILES:.cpp=.d)
+G_TEST_O_FILES := $(patsubst %.cpp,%.o,$(GTEST_CPP_FILES))
+GTEST_C_DEPS := $(patsubst %.cpp,%.d,$(GTEST_CPP_FILES))
+
 O_FILES_NO_MAIN := $(filter-out src/source/main.o, $(O_FILES))
 
 $(USER_DIR)/%.o: $(USER_DIR)/%.cpp $(O_FILES_NO_MAIN) gtest_main.a
 	@echo 'Building file: $<'
-	@echo 'Invoking: Cross G++ Compiler'
+	@echo 'Invoking: G++ Compiler'
 	@echo 'NO MAIN: $(O_FILES_NO_MAIN)'
-	$(G_TEST_COMPILER) -I$(INCLUDE_PATH) $(GTEST_CPPFLAGS) $(GTEST_CXXFLAGS) $(LD_FLAGS) gtest_main.a $^ -o $@
+	$(G_TEST_COMPILER) -I$(INCLUDE_PATH) -I$(GTEST_HEADERS) $(GTEST_CPPFLAGS) $(GTEST_CXXFLAGS) $(LD_FLAGS) gtest_main.a $^ -o $@
 	@echo 'Finished building: $<'
 	@echo ' '
 
