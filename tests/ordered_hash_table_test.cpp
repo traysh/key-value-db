@@ -1,6 +1,7 @@
 #include "gtest/gtest.h"
 #include "ordered_hash_table.h"
 #include "arbitrary_values.h"
+#include "arbitrary_values_sorted.h"
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -157,14 +158,64 @@ TEST(ORDERED_HASH_TABLE_TEST, INSERT_TOO_MANY) {
 	ordered_hash_table_destructor(t);
 }
 
-TEST(ORDERED_HASH_TABLE_TEST, GET_ORDERED_VALUES) {
+TEST(ORDERED_HASH_TABLE_TEST, GET_ORDERED_VALUES_EMPTY_BASE) {
 	ordered_hash_table_t* t = ordered_hash_table_constructor();
 	
-	for (int i = 0; i < sizeof(arbitrary_values)/sizeof(int); ++i) {
+	ordered_hash_table_entry_list_t* current = ordered_hash_table_get_top_n_values(t, 100);
+	ASSERT_TRUE(current == NULL);
+}
+
+TEST(ORDERED_HASH_TABLE_TEST, GET_ORDERED_VALUES_SINGLE_ELEMENT_BASE) {
+	ordered_hash_table_t* t = ordered_hash_table_constructor();
+	
+	ordered_hash_table_insert_elem(&t, "1", 1);
+	ordered_hash_table_entry_list_t* current = ordered_hash_table_get_top_n_values(t, 1);
+	
+	ASSERT_FALSE(current == NULL);
+	EXPECT_EQ(current->entry->value, 1);
+}
+
+TEST(ORDERED_HASH_TABLE_TEST, GET_ORDERED_VALUES_NEGATIVE_N) {
+	ordered_hash_table_t* t = ordered_hash_table_constructor();
+	
+	ordered_hash_table_entry_list_t* current = ordered_hash_table_get_top_n_values(t, -100);
+	ASSERT_TRUE(current == NULL);
+}
+
+TEST(ORDERED_HASH_TABLE_TEST, GET_ORDERED_VALUES_MORE_THAN_AVAILABLE) {
+	ordered_hash_table_t* t = ordered_hash_table_constructor();
+	
+	int values[] = { 4, 15, -6, -19, 33, 0, 2, 8, -12, 22 };
+	int values_sorted[] = { 33, 22, 15, 8, 4, 2, 0, -6, -12, -19 };
+	
+	size_t i;
+	for (i = 0; i < 10; ++i) {
 		char str[10];
-		sprintf(str, "%d", i);
+		sprintf(str, "%lu", i);
+		ordered_hash_table_insert_elem(&t, str, values[i]);
+	}
+	ordered_hash_table_entry_list_t* current = ordered_hash_table_get_top_n_values(t, 20);
+	for (int i = 0; i < 10; ++i) {
+		ASSERT_FALSE(current == NULL);
+		EXPECT_EQ(current->entry->value, values_sorted[i]);
+		current = current->next;
+	}
+	ASSERT_TRUE(current == NULL);
+}
+TEST(ORDERED_HASH_TABLE_TEST, GET_ORDERED_VALUES_A_MILLION_RANDOM_ELEMENTS_BASE) {
+	ordered_hash_table_t* t = ordered_hash_table_constructor();
+	
+	size_t i;
+	for (i = 0; i < sizeof(arbitrary_values)/sizeof(int); ++i) {
+		char str[10];
+		sprintf(str, "%lu", i);
 		ordered_hash_table_insert_elem(&t, str, arbitrary_values[i]);
 	}
 	
-	//TODO get the ordered N values
+	ordered_hash_table_entry_list_t* current = ordered_hash_table_get_top_n_values(t, 100);
+	for (int i = 0; i < 100; ++i) {
+		ASSERT_FALSE(current == NULL);
+		EXPECT_EQ(current->entry->value, arbitrary_values_sorted[i]);
+		current = current->next;
+	}
 }

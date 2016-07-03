@@ -20,6 +20,11 @@ typedef struct ordered_hash_table_t {
 	ordered_hash_table_entry_t** table;
 } ordered_hash_table_t;
 
+typedef struct ordered_hash_table_entry_list_t {
+	ordered_hash_table_entry_t* entry;
+	ordered_hash_table_entry_list_t* next;
+} ordered_hash_table_entry_list_t;
+
 /*
  *	ordered_hash_table_t constructor
  */
@@ -42,6 +47,11 @@ int ordered_hash_table_insert_elem(ordered_hash_table_t** t, const char* key, co
  *		Return NULL if key is not present
  */
 ordered_hash_table_entry_t* ordered_hash_table_find_elem(ordered_hash_table_t* t, const char* key);
+
+/*
+ *	Returns N entries which contains the ordered top N values
+ */
+ordered_hash_table_entry_list_t* ordered_hash_table_get_top_n_values(ordered_hash_table_t* t, int N);
 
 /*
  *	Updates the given key with the new_value

@@ -135,6 +135,32 @@ ordered_hash_table_entry_t* ordered_hash_table_find_elem(ordered_hash_table_t* t
 	return entry;
 }
 
+ordered_hash_table_entry_list_t** bst_get_top_n_values(bst_node_t* current,
+													   ordered_hash_table_entry_list_t** top_n_current, int* N)
+{
+	if (current == NULL || N <= 0)
+		return top_n_current;
+
+	ordered_hash_table_entry_list_t** n_top_n_current = bst_get_top_n_values(current->right, top_n_current, N);
+	
+	(*n_top_n_current) = (ordered_hash_table_entry_list_t*)malloc(sizeof(ordered_hash_table_entry_list_t));
+	(*n_top_n_current)->entry = (ordered_hash_table_entry_t*)current->info;
+	(*n_top_n_current)->next = NULL;
+	--(*N);
+	
+	return bst_get_top_n_values(current->left, &(*n_top_n_current)->next, N);
+}
+
+ordered_hash_table_entry_list_t* ordered_hash_table_get_top_n_values(ordered_hash_table_t* t, int N) {
+	if (t == NULL)
+		return NULL;
+	
+	ordered_hash_table_entry_list_t* top_n = NULL;
+	bst_get_top_n_values(t->ordered_data->root, &top_n, &N);
+	
+	return top_n;
+}
+
 int ordered_hash_table_update_elem(ordered_hash_table_t* t, const char* key, const int new_value) {
 	uint32_t hashed_key = t->hash_function(t, key, strlen(key));
 
@@ -149,7 +175,6 @@ int ordered_hash_table_update_elem(ordered_hash_table_t* t, const char* key, con
 
 	return 0;
 }
-
 
 void ordered_hash_table_delete_elem(ordered_hash_table_t* t, const char* key) {
 	if(t == NULL)
@@ -199,7 +224,7 @@ int ordered_hash_table_compare_data(const void* lhs, const void* rhs) {
 	if (v_lhs == v_rhs)
 		return 0;
 	
-	return v_lhs < v_rhs ? 1 : -1;
+	return v_lhs < v_rhs ? -1 : 1;
 }
 
 void ordered_hash_table_key_destructor(void* key) {

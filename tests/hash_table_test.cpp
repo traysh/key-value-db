@@ -156,15 +156,3 @@ TEST(HASH_TABLE_TEST, INSERT_TOO_MANY) {
 
 	hash_table_destructor(t);
 }
-
-TEST(HASH_TABLE_TEST, GET_ORDERED_VALUES) {
-	hash_table_t* t = hash_table_constructor();
-	
-	for (int i = 0; i < sizeof(arbitrary_values)/sizeof(int); ++i) {
-		char str[10];
-		sprintf(str, "%d", i);
-		hash_table_insert_elem(&t, str, arbitrary_values[i]);
-	}
-	
-	//TODO get the ordered N values
-}
