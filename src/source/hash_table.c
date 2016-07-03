@@ -80,7 +80,7 @@ static void hash_table_rehash(hash_table_t** t) {
 	*t = new_t;
 }
 
-int hash_table_insert_elem(hash_table_t** t, const char* key, const char* value) {
+int hash_table_insert_elem(hash_table_t** t, const char* key, const int value) {
 	if(t == NULL || *t == NULL)
 		return 0;
 
@@ -102,16 +102,16 @@ int hash_table_insert_elem(hash_table_t** t, const char* key, const char* value)
 	
 	(*entry) = (hash_table_entry_t*)malloc(sizeof(hash_table_entry_t));
 	(*entry)->key = strdup(key);
-	(*entry)->value = strdup(value);
+	(*entry)->value = value;
 	(*entry)->next = NULL;
 	(*t)->size++;
 
 	return 1;
 }
 
-char* hash_table_find_elem(hash_table_t* t, const char* key) {
+hash_table_entry_t* hash_table_find_elem(hash_table_t* t, const char* key) {
 	if(t == NULL)
-		return NULL;
+		return nullptr;
 
 	uint32_t uikey = t->hash_function(t, key, strlen(key));
 	hash_table_entry_t* entry = t->table[uikey];
@@ -120,20 +120,19 @@ char* hash_table_find_elem(hash_table_t* t, const char* key) {
 	}
 
 	if(entry == NULL)
-		return NULL;
+		return entry;
 
-	return entry->value;
+	return entry;
 }
 
-int hash_table_update_elem(hash_table_t* t, const char* key, const char* new_value) {
+int hash_table_update_elem(hash_table_t* t, const char* key, const int new_value) {
 	uint32_t hashed_key = t->hash_function(t, key, strlen(key));
 
 	hash_table_entry_t** entry = &(t->table[hashed_key]);
 
 	while(*entry != NULL ) {
 		if(strcmp((*entry)->key, key) == 0) { // Item already inserted, update it
-			free((*entry)->value);
-			(*entry)->value = strdup(new_value);
+			(*entry)->value = new_value;
 			return 1;
 		}
 	}
@@ -156,7 +155,6 @@ void hash_table_delete_elem(hash_table_t* t, const char* key) {
 		return;
 
 	free((*entry)->key);
-	free((*entry)->value);
 
 	hash_table_entry_t* tmp = *entry;
 	*entry = (*entry)->next;
@@ -175,7 +173,7 @@ void hash_table_print(hash_table_t* t) {
 	for(uint32_t i = 0; i < t->capacity; i++) {
 		hash_table_entry_t* tmp = t->table[i];
 		while(tmp) {
-			printf("(%s, %s)\n", tmp->key, tmp->value);
+			printf("(%s, %d)\n", tmp->key, tmp->value);
 			tmp = tmp->next;
 		}
 	}
