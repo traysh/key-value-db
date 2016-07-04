@@ -75,12 +75,12 @@ static inline void swap(heap_node_t* n1, heap_node_t* n2) {
 	memcpy (n2, &tmp, sizeof(tmp));
 }
 
-heap_node_t* heap_insert_node(heap_t* h, void* key, void* info) {
+long heap_insert_node(heap_t* h, void* key, void* info) {
 	if (h == NULL)
-		return NULL;
+		return -1;
 	
 	if (h->size == h->reserved_size && !heap_increase_size(h))
-		return NULL;
+		return -1;
 	
 	heap_node_t* data = h->data;
 	
@@ -88,7 +88,7 @@ heap_node_t* heap_insert_node(heap_t* h, void* key, void* info) {
 		data[0].key = key;
 		data[0].info = info;
 		++(h->size);
-		return &data[0];
+		return 0;
 	}
 	
 	size_t i;
@@ -98,7 +98,7 @@ heap_node_t* heap_insert_node(heap_t* h, void* key, void* info) {
 	data[i].key = key;
 	data[i].info = info;
 	
-	return &data[i];
+	return (long)i;
 }
 
 int heap_delete_node(heap_t* h, size_t index) {
@@ -144,4 +144,19 @@ int heap_delete_node(heap_t* h, size_t index) {
 	data[i].info = data[h->size].info;
 	
 	return 1;
+}
+
+heap_node_t* heap_top_n(heap_t* h, size_t N) {
+	heap_t* t = (heap_t*)malloc(sizeof(heap_t));
+	memcpy(t, h, sizeof(heap_t));
+	t->data = (heap_node_t*)malloc(t->reserved_size*sizeof(heap_node_t));
+	
+	size_t size = (N < t->size ? N : t->size);
+	heap_node_t* top_n = (heap_node_t*)malloc(size*sizeof(heap_node_t));
+		for (size_t i = 0; i < size; ++i) {
+		memcpy(&top_n[i], &t->data[0], sizeof(heap_node_t));
+		heap_delete_node(t, 0);
+	}
+	
+	return top_n;
 }

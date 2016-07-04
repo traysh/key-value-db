@@ -38,8 +38,10 @@ int heap_reserve(heap_t* t, size_t size);
 
 int heap_increase_size(heap_t* t);
 
-heap_node_t* heap_insert_node(heap_t* h, void* key, void* info);
+long heap_insert_node(heap_t* h, void* key, void* info);
 
 int heap_delete_node(heap_t* h, size_t index);
+
+heap_node_t* heap_top_n(heap_t* h, size_t N);
 	
 #endif //MAX_HEAP_H

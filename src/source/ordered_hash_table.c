@@ -41,7 +41,7 @@ ordered_hash_table_t* ordered_hash_table_constructor(uint32_t capacity) {
 	t->size = 0;
 	t->table = (ordered_hash_table_entry_t**)malloc(sizeof(ordered_hash_table_entry_t*) * t->capacity);
 	
-	t->ordered_data = bst_constructor(
+	t->ordered_data = heap_contructor(
 		ordered_hash_table_compare_data,
 		ordered_hash_table_key_destructor,
 		ordered_hash_table_info_destructor,
@@ -114,7 +114,7 @@ int ordered_hash_table_insert_elem(ordered_hash_table_t** t, const char* key, co
 	(*entry)->next = NULL;
 	(*t)->size++;
 	
-	bst_insert_node((*t)->ordered_data, &(*entry)->value, *entry);
+	(*entry)->heap_index = heap_insert_node((*t)->ordered_data, &(*entry)->value, *entry);
 
 	return 1;
 }
@@ -151,12 +151,14 @@ ordered_hash_table_entry_list_t** bst_get_top_n_values(bst_node_t* current,
 	return bst_get_top_n_values(current->left, &(*n_top_n_current)->next, N);
 }
 
-ordered_hash_table_entry_list_t* ordered_hash_table_get_top_n_values(ordered_hash_table_t* t, int N) {
+ordered_hash_table_entry_t* ordered_hash_table_get_top_n_values(ordered_hash_table_t* t, int N) {
 	if (t == NULL)
 		return NULL;
 	
-	ordered_hash_table_entry_list_t* top_n = NULL;
-	bst_get_top_n_values(t->ordered_data->root, &top_n, &N);
+	ordered_hash_table_entry_t* top_n = (ordered_hash_table_entry_t*)malloc(N*sizeof(ordered_hash_table_entry_t));
+	heap_node_t* h_nodes = heap_top_n(t->ordered_data, N);
+	for (size_t i = 0; (int)i < N; ++i)
+		memcpy(&top_n[i], h_nodes[i].info, sizeof(ordered_hash_table_entry_t));
 	
 	return top_n;
 }
@@ -197,7 +199,7 @@ void ordered_hash_table_delete_elem(ordered_hash_table_t* t, const char* key) {
 	if(*entry == NULL)
 		return;
 
-	bst_delete_node(t->ordered_data, &(*entry)->value);
+	heap_delete_node(t->ordered_data, (*entry)->heap_index);
 	
 	free((*entry)->key);
 
@@ -222,8 +224,6 @@ void ordered_hash_table_print(ordered_hash_table_t* t) {
 			tmp = tmp->next;
 		}
 	}
-	
-	bst_print(t->ordered_data);
 }
 
 int ordered_hash_table_compare_data(const void* lhs, const void* rhs) {

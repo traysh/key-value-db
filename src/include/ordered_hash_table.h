@@ -2,6 +2,7 @@
 #define ORDERED_HASH_TABLE_H
 
 #include "binary_search_tree.h"
+#include "max_heap.h"
 
 #include <stdlib.h>
 
@@ -17,7 +18,7 @@ typedef struct ordered_hash_table_entry_t {
 typedef struct ordered_hash_table_t {
 	uint32_t size;	// Number of entries inserted
 	uint32_t capacity; // size of the underlaying array
-	bst_t* ordered_data; // Tree containing ordered data pointers
+	heap_t* ordered_data; // Tree containing ordered data pointers
   uint32_t (*hash_function)(ordered_hash_table_t* t, const char* key, int len);
 
 	ordered_hash_table_entry_t** table;
@@ -54,7 +55,7 @@ ordered_hash_table_entry_t* ordered_hash_table_find_elem(ordered_hash_table_t* t
 /*
  *	Returns N entries which contains the ordered top N values
  */
-ordered_hash_table_entry_list_t* ordered_hash_table_get_top_n_values(ordered_hash_table_t* t, int N);
+ordered_hash_table_entry_t* ordered_hash_table_get_top_n_values(ordered_hash_table_t* t, int N);
 
 /*
  *	Destroys a list of entries
