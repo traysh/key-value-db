@@ -161,25 +161,28 @@ TEST(ORDERED_HASH_TABLE_TEST, INSERT_TOO_MANY) {
 TEST(ORDERED_HASH_TABLE_TEST, GET_ORDERED_VALUES_EMPTY_BASE) {
 	ordered_hash_table_t* t = ordered_hash_table_constructor();
 	
-	ordered_hash_table_entry_list_t* current = ordered_hash_table_get_top_n_values(t, 100);
-	ASSERT_TRUE(current == NULL);
+	ordered_hash_table_entry_list_t* top_n = ordered_hash_table_get_top_n_values(t, 100);
+	ASSERT_TRUE(top_n == NULL);
+	ordered_hash_table_destroy_entry_list(top_n);
 }
 
 TEST(ORDERED_HASH_TABLE_TEST, GET_ORDERED_VALUES_SINGLE_ELEMENT_BASE) {
 	ordered_hash_table_t* t = ordered_hash_table_constructor();
 	
 	ordered_hash_table_insert_elem(&t, "1", 1);
-	ordered_hash_table_entry_list_t* current = ordered_hash_table_get_top_n_values(t, 1);
+	ordered_hash_table_entry_list_t* top_n = ordered_hash_table_get_top_n_values(t, 1);
 	
-	ASSERT_FALSE(current == NULL);
-	EXPECT_EQ(current->entry->value, 1);
+	ASSERT_FALSE(top_n == NULL);
+	EXPECT_EQ(top_n->entry->value, 1);
+	ordered_hash_table_destroy_entry_list(top_n);
 }
 
 TEST(ORDERED_HASH_TABLE_TEST, GET_ORDERED_VALUES_NEGATIVE_N) {
 	ordered_hash_table_t* t = ordered_hash_table_constructor();
 	
-	ordered_hash_table_entry_list_t* current = ordered_hash_table_get_top_n_values(t, -100);
-	ASSERT_TRUE(current == NULL);
+	ordered_hash_table_entry_list_t* top_n = ordered_hash_table_get_top_n_values(t, -100);
+	ASSERT_TRUE(top_n == NULL);
+	ordered_hash_table_destroy_entry_list(top_n);
 }
 
 TEST(ORDERED_HASH_TABLE_TEST, GET_ORDERED_VALUES_MORE_THAN_AVAILABLE) {
@@ -194,13 +197,17 @@ TEST(ORDERED_HASH_TABLE_TEST, GET_ORDERED_VALUES_MORE_THAN_AVAILABLE) {
 		sprintf(str, "%lu", i);
 		ordered_hash_table_insert_elem(&t, str, values[i]);
 	}
-	ordered_hash_table_entry_list_t* current = ordered_hash_table_get_top_n_values(t, 20);
+	
+	ordered_hash_table_entry_list_t* top_n = ordered_hash_table_get_top_n_values(t, 20);
+	ordered_hash_table_entry_list_t* current = top_n;
 	for (int i = 0; i < 10; ++i) {
 		ASSERT_FALSE(current == NULL);
 		EXPECT_EQ(current->entry->value, values_sorted[i]);
 		current = current->next;
 	}
+	
 	ASSERT_TRUE(current == NULL);
+	ordered_hash_table_destroy_entry_list(top_n);
 }
 TEST(ORDERED_HASH_TABLE_TEST, GET_ORDERED_VALUES_A_MILLION_RANDOM_ELEMENTS_BASE) {
 	ordered_hash_table_t* t = ordered_hash_table_constructor();
@@ -212,10 +219,14 @@ TEST(ORDERED_HASH_TABLE_TEST, GET_ORDERED_VALUES_A_MILLION_RANDOM_ELEMENTS_BASE)
 		ordered_hash_table_insert_elem(&t, str, arbitrary_values[i]);
 	}
 	
-	ordered_hash_table_entry_list_t* current = ordered_hash_table_get_top_n_values(t, 100);
+	ordered_hash_table_entry_list_t* top_n = ordered_hash_table_get_top_n_values(t, 20);
+	ordered_hash_table_entry_list_t* current = top_n;
 	for (int i = 0; i < 100; ++i) {
 		ASSERT_FALSE(current == NULL);
 		EXPECT_EQ(current->entry->value, arbitrary_values_sorted[i]);
 		current = current->next;
 	}
+	
+	ASSERT_FALSE(current == NULL);
+	ordered_hash_table_destroy_entry_list(top_n);
 }

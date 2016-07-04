@@ -3,11 +3,14 @@
 
 #include "binary_search_tree.h"
 
+#include <stdlib.h>
+
 typedef unsigned int uint32_t;
 
 typedef struct ordered_hash_table_entry_t {
 	char* key;
 	int value;
+	size_t heap_index;
 	ordered_hash_table_entry_t* next;
 } ordered_hash_table_entry_t;
 
@@ -52,6 +55,11 @@ ordered_hash_table_entry_t* ordered_hash_table_find_elem(ordered_hash_table_t* t
  *	Returns N entries which contains the ordered top N values
  */
 ordered_hash_table_entry_list_t* ordered_hash_table_get_top_n_values(ordered_hash_table_t* t, int N);
+
+/*
+ *	Destroys a list of entries
+ */
+void ordered_hash_table_destroy_entry_list(ordered_hash_table_entry_list_t* t);
 
 /*
  *	Updates the given key with the new_value

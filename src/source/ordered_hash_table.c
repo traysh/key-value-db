@@ -161,6 +161,14 @@ ordered_hash_table_entry_list_t* ordered_hash_table_get_top_n_values(ordered_has
 	return top_n;
 }
 
+void ordered_hash_table_destroy_entry_list(ordered_hash_table_entry_list_t* t) {
+	for (ordered_hash_table_entry_list_t* i = t; i != NULL;) {
+		ordered_hash_table_entry_list_t* tmp = i;
+		i = i->next;
+		delete tmp;
+	}
+}
+
 int ordered_hash_table_update_elem(ordered_hash_table_t* t, const char* key, const int new_value) {
 	uint32_t hashed_key = t->hash_function(t, key, strlen(key));
 
