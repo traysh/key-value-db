@@ -74,10 +74,29 @@ long ordered_hash_table_size(ordered_hash_table_t* t);
  */
 void ordered_hash_table_print(ordered_hash_table_t* t);
 
+/*
+ *	Compare function of the internal binary search tree
+ */
 int ordered_hash_table_compare_data(const void* lhs, const void* rhs);
+
+/*
+ *	Dummy key destructor of the internal binary search tree
+ */
 void ordered_hash_table_key_destructor(void* key);
+
+/*
+ *	Dummy info destructor of the internal binary search tree
+ */
 void ordered_hash_table_info_destructor(void* entry);
+
+/*
+ *	Key printer of the internal binary search tree
+ */
 void ordered_hash_table_print_key(const void* key);
+
+/*
+ *	Info printer of the internal binary search tree
+ */
 void ordered_hash_table_print_info(const void* entry);
 
 #endif
