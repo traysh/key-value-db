@@ -151,7 +151,7 @@ TEST(MAX_HEAP, INSERT) {
 	heap_destructor(h);
 }
 
-TEST(MAX_HEAP, INSERT_MANY) {
+TEST(MAX_HEAP, INSERT_A_MILLION) {
 	heap_t* h = heap_contructor(long_compare,
 								key_destructor,
 								info_destructor,
