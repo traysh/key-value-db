@@ -11,77 +11,116 @@ list_t* list_constructor(
 	
 	list->first = NULL;
 	list->last = NULL;
+	list->size = 0;
+	
+	return list;
+}
+
+void list_destructor(list_t* l) {
+	while (l->size > 0) {
+		void* data = list_pop_front(l);
+		l->data_destructor(data);
+	}
+	free(l);
 }
 
 #define BACK 1
 #define FRONT -1
 
-static int list_push(list_t* t, void* data, int where) {
-	if (!t)
+static int list_push(list_t* l, void* data, int where) {
+	if (!l)
 		return 0;
-	
-	list_node_t* node_valid_neighbor = where == BACK ? t->last : t->first;
-	list_node_t** node_null_neighbor_pointer = where == FRONT ? &node->next : &node->previous;
 	
 	list_node_t* node = (list_node_t*)malloc(sizeof(list_node_t));
 	node->data = data;
-	node_null_neighbor_pointer = NULL;
 	
-	// Could be !t->last, they will be NULL always together
-	if (!t->first) { 
-		node_valid_neighbor = NULL;
-		t->first = node;
-		t->last = node;
+	// Insertion in empty list
+	if (l->size == 0) { 
+		l->first = node;
+		l->last = node;
+		++(l->size);
+		node->next = NULL;
+		node->previous = NULL;
+		
+		return 1;
+	}
+	
+	list_node_t** node_valid_neighbor_pointer;
+	list_node_t** node_pointer_to_null_neighbor;
+	list_node_t** node_pointer_to_valid_neighbor;
+	
+	// Configures the pointers
+	if (where == BACK) {
+		node_valid_neighbor_pointer = &l->last;
+		node_pointer_to_null_neighbor = &node->next;
+		node_pointer_to_valid_neighbor = &node->previous;
 	}
 	else {
-		if (where == BACK) {
-			node->previous = node_valid_neighbor;
-			node_valid_neighbor->next = node;
-			t->last = node;
-		}
-		else  {
-			node->next = node_valid_neighbor;
-			node_valid_neighbor->last = node;
-			t->first = node;
-		}
+		node_valid_neighbor_pointer = &l->first;
+		node_pointer_to_null_neighbor = &node->previous;
+		node_pointer_to_valid_neighbor = &node->next;
 	}
+	
+	*node_pointer_to_null_neighbor = NULL;
+	*node_pointer_to_valid_neighbor = *node_valid_neighbor_pointer;
+	*node_valid_neighbor_pointer = node;
+	++(l->size);
 	
 	return 1;
 }
 
-int list_push_front(list_t* t, void* data) {
-	list_push(t, data, FRONT);
+int list_push_front(list_t* l, void* data) {
+	return list_push(l, data, FRONT);
 }
 
-int list_push_back(list_t* t, void* data) {
-	list_push(t, data, BACK);
+int list_push_back(list_t* l, void* data) {
+	return list_push(l, data, BACK);
 }
 
-void* list_pop(list_t* t, int where) {
+static void* list_pop(list_t* l, int where) {
+	if (!l || l->size == 0)
+		return NULL;
+	
 	list_node_t* node;
-	list_node_t** node_valid_neighbor_node_pointer;
-	if (where == BACK) {
-		node = t->last;
-		node_valid_neighbor_node_pointer = &t->last->previous->next;
+	if (l->size == 1) {
+		node = l->first;
+		l->first = NULL;
+		l->last = NULL;
+	}
+	else if (where == BACK) {
+		node = l->last;
+		l->last->previous->next = NULL;
+		l->last = node->previous;
 	}
 	else {
-		node = t->first;
-		node_valid_neighbor_node_pointer = &t->first->next->previous;
+		node = l->first;
+		l->first->next->previous = NULL;
+		l->first = node->next;
 	}
 	
-	node_valid_neighbor_node_pointer = NULL;
 	void* data = node->data;
 	free(node);
+	--(l->size);
 	
 	return data;
 }
 
-void* list_pop_back(list_t* t) {
-	return list_pop(t, BACK);
+void* list_pop_back(list_t* l) {
+	return list_pop(l, BACK);
 }
 
-void* list_pop_front(list_t* t) {
-	return list_pop(t, FRONT);
+void* list_pop_front(list_t* l) {
+	return list_pop(l, FRONT);
+}
+
+void* list_peek_back(list_t* l)
+{
+	return l->last->data;
+}
+
+void* list_peek_front(list_t* l)
+{
+	return l->first->data;
 }
 
 #undef BACK

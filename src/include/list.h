@@ -6,8 +6,8 @@
 #define LIST_INITIAL_SIZE 1024
 
 typedef struct list_node_t {
-	void* next;
-	void* previous;
+	list_node_t* next;
+	list_node_t* previous;
 	void* data;
 } list_node_t;
 
@@ -27,6 +27,8 @@ list_t* list_constructor(
 		void (*print_data)(const void* data)
 );
 
+void list_destructor(list_t* l);
+
 int list_push_back(list_t* t, void* data);
 
 int list_push_front(list_t* t, void* data);
@@ -34,3 +36,9 @@ int list_push_front(list_t* t, void* data);
 void* list_pop_back(list_t* t);
 
 void* list_pop_front(list_t* t);
+
+void* list_peek_back(list_t* t);
+
+void* list_peek_front(list_t* t);
+
+#endif // LIST_H
