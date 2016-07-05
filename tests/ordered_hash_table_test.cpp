@@ -245,11 +245,8 @@ TEST(ORDERED_HASH_TABLE_TEST, GET_ORDERED_VALUES_A_MILLION_RANDOM_ELEMENTS_BASE)
 	ordered_hash_table_t* t = ordered_hash_table_constructor();
 	
 	size_t i;
-	for (i = 0; i < sizeof(arbitrary_values)/sizeof(int); ++i) {
-		char str[10];
-		sprintf(str, "%lu", i);
-		ordered_hash_table_insert_elem(&t, str, arbitrary_values[i]);
-	}
+	for (i = 0; i < sizeof(arbitrary_values)/sizeof(int); ++i)
+		ordered_hash_table_insert_elem(&t, (char*)&i, arbitrary_values[i]);
 	
 	list_t* top_n = ordered_hash_table_get_top_n_values(t, 100);
 	for (int i = 0; i < 100; ++i) {
