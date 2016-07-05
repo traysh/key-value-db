@@ -55,7 +55,7 @@ ordered_hash_table_entry_t* ordered_hash_table_find_elem(ordered_hash_table_t* t
 /*
  *	Returns N entries which contains the ordered top N values
  */
-ordered_hash_table_entry_t* ordered_hash_table_get_top_n_values(ordered_hash_table_t* t, int N);
+list_t* ordered_hash_table_get_top_n_values(ordered_hash_table_t* t, int N);
 
 /*
  *	Destroys a list of entries

@@ -114,7 +114,8 @@ int ordered_hash_table_insert_elem(ordered_hash_table_t** t, const char* key, co
 	(*entry)->next = NULL;
 	(*t)->size++;
 	
-	(*entry)->heap_index = heap_insert_node((*t)->ordered_data, &(*entry)->value, *entry);
+	long v = (*entry)->value;
+	(*entry)->heap_index = heap_insert_node((*t)->ordered_data, (void*)v, *entry);
 
 	return 1;
 }
@@ -135,32 +136,11 @@ ordered_hash_table_entry_t* ordered_hash_table_find_elem(ordered_hash_table_t* t
 	return entry;
 }
 
-ordered_hash_table_entry_list_t** bst_get_top_n_values(bst_node_t* current,
-													   ordered_hash_table_entry_list_t** top_n_current, int* N)
-{
-	if (current == NULL || N <= 0)
-		return top_n_current;
-
-	ordered_hash_table_entry_list_t** n_top_n_current = bst_get_top_n_values(current->right, top_n_current, N);
-	
-	(*n_top_n_current) = (ordered_hash_table_entry_list_t*)malloc(sizeof(ordered_hash_table_entry_list_t));
-	(*n_top_n_current)->entry = (ordered_hash_table_entry_t*)current->info;
-	(*n_top_n_current)->next = NULL;
-	--(*N);
-	
-	return bst_get_top_n_values(current->left, &(*n_top_n_current)->next, N);
-}
-
-ordered_hash_table_entry_t* ordered_hash_table_get_top_n_values(ordered_hash_table_t* t, int N) {
+list_t* ordered_hash_table_get_top_n_values(ordered_hash_table_t* t, int N) {
 	if (t == NULL)
 		return NULL;
 	
-	ordered_hash_table_entry_t* top_n = (ordered_hash_table_entry_t*)malloc(N*sizeof(ordered_hash_table_entry_t));
-	heap_node_t* h_nodes = heap_top_n(t->ordered_data, N);
-	for (size_t i = 0; (int)i < N; ++i)
-		memcpy(&top_n[i], h_nodes[i].info, sizeof(ordered_hash_table_entry_t));
-	
-	return top_n;
+	return heap_top_n(t->ordered_data, N);
 }
 
 void ordered_hash_table_destroy_entry_list(ordered_hash_table_entry_list_t* t) {
@@ -227,8 +207,8 @@ void ordered_hash_table_print(ordered_hash_table_t* t) {
 }
 
 int ordered_hash_table_compare_data(const void* lhs, const void* rhs) {
-	const int v_lhs = *(const int *)lhs;
-	const int v_rhs = *(const int *)rhs;
+	const int v_lhs = (int)(long)lhs;
+	const int v_rhs = (int)(long)rhs;
 	if (v_lhs == v_rhs)
 		return 0;
 	

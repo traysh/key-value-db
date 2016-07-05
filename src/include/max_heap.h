@@ -3,6 +3,8 @@
 
 #include <stdlib.h>
 
+#include "list.h"
+
 #define HEAP_INITIAL_SIZE 1024
 
 typedef struct heap_node_t {
@@ -42,6 +44,6 @@ long heap_insert_node(heap_t* h, void* key, void* info);
 
 int heap_delete_node(heap_t* h, size_t index);
 
-heap_node_t* heap_top_n(heap_t* h, size_t N);
+list_t* heap_top_n(heap_t* h, size_t N);
 	
 #endif //MAX_HEAP_H

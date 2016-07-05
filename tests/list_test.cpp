@@ -91,6 +91,8 @@ TEST(LIST, INSERT_POP) {
 	data = list_pop_back(l);
 	EXPECT_EQ(l->size, 0);
 	EXPECT_EQ((long)data, 0);
+	
+	list_destructor(l);
 }
 
 TEST(LIST, POP_EMPTY_LIST) {
@@ -100,4 +102,6 @@ TEST(LIST, POP_EMPTY_LIST) {
 	EXPECT_EQ(l->size, 0);
 	ASSERT_TRUE(list_pop_front(l) == NULL);
 	EXPECT_EQ(l->size, 0);
+	
+	list_destructor(l);
 }

@@ -36,36 +36,25 @@ static int list_push(list_t* l, void* data, int where) {
 	
 	// Insertion in empty list
 	if (l->size == 0) { 
-		l->first = node;
-		l->last = node;
-		++(l->size);
 		node->next = NULL;
 		node->previous = NULL;
-		
-		return 1;
+		l->first = node;
+		l->last = node;
 	}
-	
-	list_node_t** node_valid_neighbor_pointer;
-	list_node_t** node_pointer_to_null_neighbor;
-	list_node_t** node_pointer_to_valid_neighbor;
-	
-	// Configures the pointers
-	if (where == BACK) {
-		node_valid_neighbor_pointer = &l->last;
-		node_pointer_to_null_neighbor = &node->next;
-		node_pointer_to_valid_neighbor = &node->previous;
+	else if (where == BACK) {
+		node->next = NULL;
+		node->previous = l->last;
+		l->last->next = node;
+		l->last = node;
 	}
 	else {
-		node_valid_neighbor_pointer = &l->first;
-		node_pointer_to_null_neighbor = &node->previous;
-		node_pointer_to_valid_neighbor = &node->next;
+		node->previous = NULL;
+		node->next = l->first;
+		l->first->previous = node;
+		l->first = node;
 	}
 	
-	*node_pointer_to_null_neighbor = NULL;
-	*node_pointer_to_valid_neighbor = *node_valid_neighbor_pointer;
-	*node_valid_neighbor_pointer = node;
 	++(l->size);
-	
 	return 1;
 }
 

@@ -1,6 +1,7 @@
 #include "gtest/gtest.h"
 
 #include "max_heap.h"
+#include "list.h"
 
 int long_compare(const void* lhs, const void* rhs) {
 	long ilhs = (long)lhs;
@@ -326,5 +327,51 @@ TEST(MAX_HEAP, DELETE_NODE) {
 	EXPECT_EQ((long)h->data[8].key, 3);
 	EXPECT_EQ((long)h->data[9].key, 1);
 	EXPECT_EQ((long)h->data[10].key, 2);
+	heap_destructor(h);
+}
+
+TEST(MAX_HEAP, TOP_N) {
+	heap_t* h = heap_contructor(long_compare,
+								key_destructor,
+								info_destructor,
+								print_key,
+								print_info);
+	
+	EXPECT_EQ(h->size, 0);
+	EXPECT_EQ(h->reserved_size, HEAP_INITIAL_SIZE);
+	
+	//// INSERTIONS
+	// Level 0
+	heap_insert_node(h, (void*)4, (void*)"4");
+	
+	// Level 1
+	heap_insert_node(h, (void*)0, (void*)"0");
+	heap_insert_node(h, (void*)2, (void*)"2");
+	
+	// Level 2
+	heap_insert_node(h, (void*)17, (void*)"17");
+	heap_insert_node(h, (void*)9, (void*)"9");
+	heap_insert_node(h, (void*)7, (void*)"7");
+	heap_insert_node(h, (void*)14, (void*)"14");
+	
+	// Level 3
+	heap_insert_node(h, (void*)10, (void*)"10");
+	heap_insert_node(h, (void*)8, (void*)"8");
+	heap_insert_node(h, (void*)3, (void*)"3");
+	heap_insert_node(h, (void*)5, (void*)"5");
+	heap_insert_node(h, (void*)15, (void*)"15");
+	heap_insert_node(h, (void*)6, (void*)"6");
+	heap_insert_node(h, (void*)1, (void*)"1");
+	heap_insert_node(h, (void*)20, (void*)"20");
+	
+	list_t* top_n = heap_top_n(h, 10);
+	EXPECT_EQ(top_n->size, 10);
+	long expected[] = { 20, 17, 15, 14, 10, 9, 8, 7, 6, 5 };
+	for (size_t i = 0; i < top_n->size-1; ++i) {
+		EXPECT_EQ(expected[i], (long)list_pop_front(top_n));
+		EXPECT_EQ(top_n->size, 10-i-1);
+	}
+	
+	list_destructor(top_n);
 	heap_destructor(h);
 }

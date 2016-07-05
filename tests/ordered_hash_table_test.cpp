@@ -154,35 +154,66 @@ TEST(ORDERED_HASH_TABLE_TEST, INSERT_TOO_MANY) {
 	EXPECT_EQ(ordered_hash_table_find_elem(t, "7777")->value, 7777);
 	EXPECT_EQ(ordered_hash_table_find_elem(t, "foo"), nullptr);
 	
-
 	ordered_hash_table_destructor(t);
 }
 
 TEST(ORDERED_HASH_TABLE_TEST, GET_ORDERED_VALUES_EMPTY_BASE) {
 	ordered_hash_table_t* t = ordered_hash_table_constructor();
 	
-	ordered_hash_table_entry_list_t* top_n = ordered_hash_table_get_top_n_values(t, 100);
-	ASSERT_TRUE(top_n == NULL);
-	ordered_hash_table_destroy_entry_list(top_n);
+	list_t* top_n = ordered_hash_table_get_top_n_values(t, 100);
+	EXPECT_EQ(top_n->size, 0);
+	
+	list_destructor(top_n);
+	ordered_hash_table_destructor(t);
 }
 
 TEST(ORDERED_HASH_TABLE_TEST, GET_ORDERED_VALUES_SINGLE_ELEMENT_BASE) {
 	ordered_hash_table_t* t = ordered_hash_table_constructor();
 	
 	ordered_hash_table_insert_elem(&t, "1", 1);
-	ordered_hash_table_entry_list_t* top_n = ordered_hash_table_get_top_n_values(t, 1);
+	list_t* top_n = ordered_hash_table_get_top_n_values(t, 1);
 	
-	ASSERT_FALSE(top_n == NULL);
-	EXPECT_EQ(top_n->entry->value, 1);
-	ordered_hash_table_destroy_entry_list(top_n);
+	EXPECT_EQ((long)list_peek_front(top_n), 1);
+	EXPECT_EQ((long)list_peek_back(top_n), 1);
+	EXPECT_EQ(top_n->size, 1);
+	
+	list_destructor(top_n);
+	ordered_hash_table_destructor(t);
 }
 
 TEST(ORDERED_HASH_TABLE_TEST, GET_ORDERED_VALUES_NEGATIVE_N) {
 	ordered_hash_table_t* t = ordered_hash_table_constructor();
 	
-	ordered_hash_table_entry_list_t* top_n = ordered_hash_table_get_top_n_values(t, -100);
-	ASSERT_TRUE(top_n == NULL);
-	ordered_hash_table_destroy_entry_list(top_n);
+	list_t* top_n = ordered_hash_table_get_top_n_values(t, -100);
+	EXPECT_EQ(top_n->size, 0);
+	
+	list_destructor(top_n);
+	ordered_hash_table_destructor(t);
+}
+
+TEST(ORDERED_HASH_TABLE_TEST, GET_ORDERED_VALUES) {
+	ordered_hash_table_t* t = ordered_hash_table_constructor();
+	
+	int values[] = { 4, 15, -6, -19, 33, 0, 2, 8, -12, 22 };
+	int values_sorted[] = { 33, 22, 15, 8, 4, 2, 0, -6, -12, -19 };
+	
+	size_t i;
+	for (i = 0; i < 10; ++i) {
+		char str[10];
+		sprintf(str, "%lu", i);
+		ordered_hash_table_insert_elem(&t, str, values[i]);
+	}
+	
+	list_t* top_n = ordered_hash_table_get_top_n_values(t, 10);
+	EXPECT_EQ(top_n->size, 10);
+	for (int i = 0; i < 10; ++i) {
+		EXPECT_EQ(values_sorted[i], (long)list_pop_front(top_n));
+		EXPECT_EQ(top_n->size, 10-i-1);
+	}
+	EXPECT_EQ(top_n->size, 0);
+	
+	list_destructor(top_n);
+	ordered_hash_table_destructor(t);
 }
 
 TEST(ORDERED_HASH_TABLE_TEST, GET_ORDERED_VALUES_MORE_THAN_AVAILABLE) {
@@ -198,17 +229,18 @@ TEST(ORDERED_HASH_TABLE_TEST, GET_ORDERED_VALUES_MORE_THAN_AVAILABLE) {
 		ordered_hash_table_insert_elem(&t, str, values[i]);
 	}
 	
-	ordered_hash_table_entry_list_t* top_n = ordered_hash_table_get_top_n_values(t, 20);
-	ordered_hash_table_entry_list_t* current = top_n;
+	list_t* top_n = ordered_hash_table_get_top_n_values(t, 20);
+	EXPECT_EQ(top_n->size, 10);
 	for (int i = 0; i < 10; ++i) {
-		ASSERT_FALSE(current == NULL);
-		EXPECT_EQ(current->entry->value, values_sorted[i]);
-		current = current->next;
+		EXPECT_EQ(values_sorted[i], (long)list_pop_front(top_n));
+		EXPECT_EQ(top_n->size, 10-i-1);
 	}
+	EXPECT_EQ(top_n->size, 0);
 	
-	ASSERT_TRUE(current == NULL);
-	ordered_hash_table_destroy_entry_list(top_n);
+	list_destructor(top_n);
+	ordered_hash_table_destructor(t);
 }
+
 TEST(ORDERED_HASH_TABLE_TEST, GET_ORDERED_VALUES_A_MILLION_RANDOM_ELEMENTS_BASE) {
 	ordered_hash_table_t* t = ordered_hash_table_constructor();
 	
@@ -219,14 +251,13 @@ TEST(ORDERED_HASH_TABLE_TEST, GET_ORDERED_VALUES_A_MILLION_RANDOM_ELEMENTS_BASE)
 		ordered_hash_table_insert_elem(&t, str, arbitrary_values[i]);
 	}
 	
-	ordered_hash_table_entry_list_t* top_n = ordered_hash_table_get_top_n_values(t, 20);
-	ordered_hash_table_entry_list_t* current = top_n;
+	list_t* top_n = ordered_hash_table_get_top_n_values(t, 100);
 	for (int i = 0; i < 100; ++i) {
-		ASSERT_FALSE(current == NULL);
-		EXPECT_EQ(current->entry->value, arbitrary_values_sorted[i]);
-		current = current->next;
+		EXPECT_EQ(arbitrary_values_sorted[i], (long)list_pop_front(top_n));
+		EXPECT_EQ(top_n->size, 100-i-1);
 	}
+	EXPECT_EQ(top_n->size, 0);
 	
-	ASSERT_FALSE(current == NULL);
-	ordered_hash_table_destroy_entry_list(top_n);
+	list_destructor(top_n);
+	ordered_hash_table_destructor(t);
 }
