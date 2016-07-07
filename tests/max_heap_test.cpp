@@ -24,23 +24,129 @@ void info_destructor(void*) {
 }
 
 void print_key(const void* key) {
-	printf("%ld", *((const long*)key));
+	printf("%ld ", (const long)key);
 }
 
 void print_info(const void* info) {
 	printf("%s", (char*)info);
 }
 
-TEST(MAX_HEAP, INSERT) {
-	///// Primeira vez: inserção em ordem
-	heap_t* h = heap_contructor(long_compare,
+TEST(MAX_HEAP, INSERT_3) {
+	heap_t* h = heap_contructor(3, long_compare,
 								key_destructor,
 								info_destructor,
 								print_key,
 								print_info);
 	
 	EXPECT_EQ(h->size, 0);
-	EXPECT_EQ(h->reserved_size, HEAP_INITIAL_SIZE);
+	EXPECT_EQ(h->max_size, 3);
+	
+	// Level 0
+	heap_insert_node(h, (void*)10, (void*)"17");
+	
+	// Level 1
+	heap_insert_node(h, (void*)15, (void*)"10");
+	heap_insert_node(h, (void*)20, (void*)"15");
+	
+	
+	// Level 0
+	EXPECT_EQ((long)h->data[0].key, 20);
+	
+	// Level 1
+	EXPECT_EQ((long)h->data[1].key, 10);
+	EXPECT_EQ((long)h->data[2].key, 15);
+	
+	heap_destructor(h);
+}
+
+TEST(MAX_HEAP, INSERT_6) {
+	heap_t* h = heap_contructor(7, long_compare,
+								key_destructor,
+								info_destructor,
+								print_key,
+								print_info);
+	
+	EXPECT_EQ(h->size, 0);
+	EXPECT_EQ(h->max_size, 7);
+	
+	// Level 0
+	heap_insert_node(h, (void*)10, (void*)"");
+	
+	// Level 1
+	heap_insert_node(h, (void*)15, (void*)"");
+	heap_insert_node(h, (void*)20, (void*)"");
+	
+	// Level 2
+	heap_insert_node(h, (void*)1, (void*)"");
+	heap_insert_node(h, (void*)30, (void*)"");
+	heap_insert_node(h, (void*)14, (void*)"");
+	
+	// Level 0
+	EXPECT_EQ((long)h->data[0].key, 30);
+	
+	// Level 1
+	EXPECT_EQ((long)h->data[1].key, 20);
+	EXPECT_EQ((long)h->data[2].key, 15);
+	
+	// Level 1
+	EXPECT_EQ((long)h->data[3].key, 1);
+	EXPECT_EQ((long)h->data[4].key, 10);
+	EXPECT_EQ((long)h->data[5].key, 14);
+	
+	heap_destructor(h);
+}
+
+TEST(MAX_HEAP, INSERT_7) {
+	heap_t* h = heap_contructor(7, long_compare,
+								key_destructor,
+								info_destructor,
+								print_key,
+								print_info);
+	
+	EXPECT_EQ(h->size, 0);
+	EXPECT_EQ(h->max_size, 7);
+	
+	// Level 0
+	heap_insert_node(h, (void*)20, (void*)"");
+	
+	// Level 1
+	heap_insert_node(h, (void*)17, (void*)"");
+	heap_insert_node(h, (void*)15, (void*)"");
+	
+	// Level 2
+	heap_insert_node(h, (void*)10, (void*)"");
+	heap_insert_node(h, (void*)14, (void*)"");
+	heap_insert_node(h, (void*)1, (void*)"");
+	heap_insert_node(h, (void*)30, (void*)"");
+	
+	
+	
+	// Level 0
+	EXPECT_EQ((long)h->data[0].key, 30);
+	
+	// Level 1
+	EXPECT_EQ((long)h->data[1].key, 17);
+	EXPECT_EQ((long)h->data[2].key, 20);
+	
+	// Level 1
+	EXPECT_EQ((long)h->data[3].key, 10);
+	EXPECT_EQ((long)h->data[4].key, 14);
+	EXPECT_EQ((long)h->data[5].key, 1);
+	EXPECT_EQ((long)h->data[6].key, 15);
+	
+	heap_destructor(h);
+}
+
+TEST(MAX_HEAP, INSERT) {
+	///// Primeira vez: inserção em ordem
+	heap_t* h = heap_contructor(15, long_compare,
+								key_destructor,
+								info_destructor,
+								print_key,
+								print_info);
+	
+	EXPECT_EQ(h->size, 0);
+	EXPECT_EQ(h->max_size, 15);
 	
 	// Level 0
 	heap_insert_node(h, (void*)20, (void*)"20");
@@ -92,7 +198,7 @@ TEST(MAX_HEAP, INSERT) {
 	
 	///// Segunda vez: inserção fora de ordem
 	
-	h = heap_contructor(long_compare,
+	h = heap_contructor(15, long_compare,
 								key_destructor,
 								info_destructor,
 								print_key,
@@ -100,7 +206,7 @@ TEST(MAX_HEAP, INSERT) {
 	
 	
 	EXPECT_EQ(h->size, 0);
-	EXPECT_EQ(h->reserved_size, HEAP_INITIAL_SIZE);
+	EXPECT_EQ(h->max_size, 15);
 	
 	// Level 0
 	heap_insert_node(h, (void*)17, (void*)"17");
@@ -142,17 +248,12 @@ TEST(MAX_HEAP, INSERT) {
 	EXPECT_EQ((long)h->data[7].key, 8);
 	EXPECT_EQ((long)h->data[8].key, 3);
 	EXPECT_EQ((long)h->data[9].key, 4);
-	EXPECT_EQ((long)h->data[10].key, 2);
-	EXPECT_EQ((long)h->data[11].key, 0);
-	EXPECT_EQ((long)h->data[12].key, 6);
-	EXPECT_EQ((long)h->data[13].key, 1);
-	EXPECT_EQ((long)h->data[14].key, 7);
 	
 	heap_destructor(h);
 }
 
 TEST(MAX_HEAP, INSERT_A_MILLION) {
-	heap_t* h = heap_contructor(long_compare,
+	heap_t* h = heap_contructor(10, long_compare,
 								key_destructor,
 								info_destructor,
 								print_key,
@@ -160,29 +261,29 @@ TEST(MAX_HEAP, INSERT_A_MILLION) {
 	
 	
 	EXPECT_EQ(h->size, 0);
-	EXPECT_EQ(h->reserved_size, HEAP_INITIAL_SIZE);
+	EXPECT_EQ(h->max_size, HEAP_INITIAL_SIZE);
 	
 	for (size_t i = HEAP_INITIAL_SIZE*HEAP_INITIAL_SIZE -1; i+1 > 0; --i)
 		heap_insert_node(h, (void*)i, (void*)"foo");
 	
-	EXPECT_EQ(h->size, HEAP_INITIAL_SIZE*HEAP_INITIAL_SIZE);
-	EXPECT_EQ(h->reserved_size, HEAP_INITIAL_SIZE*HEAP_INITIAL_SIZE);
+	EXPECT_EQ(h->size, 10);
+	EXPECT_EQ(h->max_size, 10);
 	
-	for (size_t i = 0; i < HEAP_INITIAL_SIZE*HEAP_INITIAL_SIZE; ++i)
+	for (size_t i = 0; i < 10; ++i)
 		EXPECT_EQ((long)h->data[i].key, HEAP_INITIAL_SIZE*HEAP_INITIAL_SIZE -1 -i);
 	
 	heap_destructor(h);
 }
 
 TEST(MAX_HEAP, DELETE_NODE) {
-	heap_t* h = heap_contructor(long_compare,
+	heap_t* h = heap_contructor(15, long_compare,
 								key_destructor,
 								info_destructor,
 								print_key,
 								print_info);
 	
 	EXPECT_EQ(h->size, 0);
-	EXPECT_EQ(h->reserved_size, HEAP_INITIAL_SIZE);
+	EXPECT_EQ(h->max_size, 15);
 	
 	// Level 0
 	heap_insert_node(h, (void*)17, (void*)"17");
@@ -331,14 +432,14 @@ TEST(MAX_HEAP, DELETE_NODE) {
 }
 
 TEST(MAX_HEAP, TOP_N) {
-	heap_t* h = heap_contructor(long_compare,
+	heap_t* h = heap_contructor(10, long_compare,
 								key_destructor,
 								info_destructor,
 								print_key,
 								print_info);
 	
 	EXPECT_EQ(h->size, 0);
-	EXPECT_EQ(h->reserved_size, HEAP_INITIAL_SIZE);
+	EXPECT_EQ(h->max_size, HEAP_INITIAL_SIZE);
 	
 	//// INSERTIONS
 	// Level 0
@@ -364,7 +465,7 @@ TEST(MAX_HEAP, TOP_N) {
 	heap_insert_node(h, (void*)1, (void*)"1");
 	heap_insert_node(h, (void*)20, (void*)"20");
 	
-	list_t* top_n = heap_top_n(h, 10);
+	list_t* top_n = heap_top_n(h);
 	EXPECT_EQ(top_n->size, 10);
 	long expected[] = { 20, 17, 15, 14, 10, 9, 8, 7, 6, 5 };
 	for (size_t i = 0; i < top_n->size-1; ++i) {

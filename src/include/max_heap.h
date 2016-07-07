@@ -5,7 +5,7 @@
 
 #include "list.h"
 
-#define HEAP_INITIAL_SIZE 1024
+#define HEAP_INITIAL_SIZE 10
 
 typedef struct heap_node_t {
 	void* key;
@@ -15,7 +15,7 @@ typedef struct heap_node_t {
 typedef struct heap_t {
 	// fields
 	size_t size;
-	size_t reserved_size;
+	size_t max_size;
 	heap_node_t* data;
 	
 	// functions
@@ -27,6 +27,7 @@ typedef struct heap_t {
 } heap_t;
 
 heap_t* heap_contructor(
+		size_t max_size,
 		int (*f_compare)(const void* lhs, const void* rhs),
 		void (*key_destructor)(void* key),
 		void (*info_destructor)(void* info),
@@ -44,6 +45,8 @@ long heap_insert_node(heap_t* h, void* key, void* info);
 
 int heap_delete_node(heap_t* h, size_t index);
 
-list_t* heap_top_n(heap_t* h, size_t N);
+list_t* heap_top_n(heap_t* h);
+
+void heap_print(heap_t* h);
 	
 #endif //MAX_HEAP_H

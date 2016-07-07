@@ -2,8 +2,10 @@
 
 #include <string.h>
 #include "stdio.h"
+#include "math.h"
 
 heap_t* heap_contructor(
+		size_t max_size,
 		int (*f_compare)(const void* lhs, const void* rhs),
 		void (*key_destructor)(void* key),
 		void (*info_destructor)(void* info),
@@ -12,8 +14,8 @@ heap_t* heap_contructor(
 {
 	heap_t* h = (heap_t*)malloc(sizeof(heap_t));
 	h->size = 0;
-	h->reserved_size = HEAP_INITIAL_SIZE;
-	h->data = (heap_node_t*)malloc(HEAP_INITIAL_SIZE*sizeof(heap_node_t));
+	h->max_size = max_size;
+	h->data = (heap_node_t*)malloc((max_size+1)*sizeof(heap_node_t));
 	
 	h->f_compare = f_compare;
 	h->key_destructor = key_destructor;
@@ -39,12 +41,12 @@ int heap_reserve(heap_t* t, size_t size) {
 		return 0;
 	
 	t->data = new_data;
-	t->reserved_size = size;
+	t->max_size = size;
 	return 1;
 }
 
 int heap_increase_size(heap_t* t) {
-	return heap_reserve(t, t->reserved_size + HEAP_INITIAL_SIZE);
+	return heap_reserve(t, t->max_size + HEAP_INITIAL_SIZE);
 }
 
 static inline size_t parent_i(size_t node_index) {
@@ -81,9 +83,6 @@ long heap_insert_node(heap_t* h, void* key, void* info) {
 	if (h == NULL)
 		return -1;
 	
-	if (h->size == h->reserved_size && !heap_increase_size(h))
-		return -1;
-	
 	heap_node_t* data = h->data;
 	
 	if (h->size == 0) {
@@ -100,6 +99,22 @@ long heap_insert_node(heap_t* h, void* key, void* info) {
 	data[i].key = key;
 	data[i].info = info;
 	
+	size_t height = log2(h->size);
+	size_t first_leaf = pow(2, height);
+	
+	if (h->size == h->max_size +1) {
+		for (size_t i = h->size -1; i >= first_leaf; --i) {
+			if (data[i].key < data[h->size -1].key) {
+				heap_node_t tmp;
+				memcpy(&tmp, &data[h->size-1], sizeof(heap_node_t));
+				memcpy(&data[h->size-1], &data[i], sizeof(heap_node_t));
+				memcpy(&data[i], &tmp, sizeof(heap_node_t));
+			}
+		}
+		
+		h->size = h->max_size;
+	}
+		
 	return (long)i;
 }
 
@@ -148,15 +163,15 @@ int heap_delete_node(heap_t* h, size_t index) {
 	return 1;
 }
 
-list_t* heap_top_n(heap_t* h, size_t N) {
+list_t* heap_top_n(heap_t* h) {
 	list_t* l = list_constructor(h->key_destructor, h->print_key);
 	
 	heap_t* t = (heap_t*)malloc(sizeof(heap_t));
 	memcpy(t, h, sizeof(heap_t));
-	t->data = (heap_node_t*)malloc(t->reserved_size*sizeof(heap_node_t));
-	memcpy(t->data, h->data, t->reserved_size*sizeof(heap_node_t));
+	t->data = (heap_node_t*)malloc(t->max_size*sizeof(heap_node_t));
+	memcpy(t->data, h->data, t->max_size*sizeof(heap_node_t));
 	
-	size_t size = (N < t->size ? N : t->size);
+	size_t size = (t->max_size < t->size ? t->max_size : t->size);
 	for (size_t i = 0; i < size; ++i) {
 		list_push_back(l, t->data[0].key);
 		heap_delete_node(t, 0);
@@ -164,4 +179,11 @@ list_t* heap_top_n(heap_t* h, size_t N) {
 	
 	heap_destructor(t);
 	return l;
+}
+
+void heap_print(heap_t* h) {
+	for (size_t i = 0; i < h->size; ++i) {
+		h->print_key(h->data[i].key);
+	}
+	printf("\n");
 }
