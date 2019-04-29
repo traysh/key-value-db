@@ -138,7 +138,7 @@ ordered_hash_table_entry_t* ordered_hash_table_find_elem(ordered_hash_table_t* t
 ordered_hash_table_entry_list_t** bst_get_top_n_values(bst_node_t* current,
 													   ordered_hash_table_entry_list_t** top_n_current, int* N)
 {
-	if (current == NULL || N <= 0)
+	if (current == NULL || N <= (int*)0)
 		return top_n_current;
 
 	ordered_hash_table_entry_list_t** n_top_n_current = bst_get_top_n_values(current->right, top_n_current, N);

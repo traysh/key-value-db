@@ -6,3 +6,5 @@
 key-value-db
 vgcore*
 *.kdev4
+*.dSYM
+*.swp
